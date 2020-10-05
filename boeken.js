@@ -18,13 +18,30 @@ const boeken = {
 		let html = "";
 		this.data.forEach(boek =>{
 			//in het geval van een voortitel moet deze voor de titel worden geplaatst
-			let titel = "";
+			let completeTitel = "";
 			if(boek.voortitel){
-				titel += boek.voortitel + " ";
+				completeTitel += boek.voortitel + " ";
 			}
-			titel += boek.titel;
-			html += `<h3>${titel}</h3>`;
+			completeTitel += boek.titel;
+			//een lijst met auteurs maken
+			let auteurs = "";
+			boek.auteurs.forEach(schrijver => {
+				let tv = schrijver.tussenvoegsel ? schrijver.tussenvoegsel + " " : "";
+				let separator = " ";
+				auteurs += schrijver.voornaam + " " + tv + schrijver.achternaam + separator;
+			});
+			//html var toevoegen
+			html += `<section class="boek">`;
+			html += `<img class="boek__cover" src="${boek.cover}" alt="${completeTitel}">`
+			html += `<h3 class="boek__kop">${completeTitel}</h3>`;
+			html += `<p class="boek__auteurs">${auteurs}</p>`
+			html += `<span class="boek__uitgave"> ${boek.uitgave}</span>`;
+			html += `<span class="boek__ean"> ean: ${boek.ean}</span>`;
+			html += `<span class="boek__paginas"> ${boek.paginas} pagina's </span>`;
+			html += `<span class="boek__taal"> ${boek.taal}</span>`;
+			html += `<div class="boek__prijs">&euro;${boek.prijs}</div>`;
+			html += `</section>`;
 		});
 		uitvoer.innerHTML = html;
 	}
-} 
+}
