@@ -27,4 +27,4 @@ const boeken = {
 		});
 		uitvoer.innerHTML = html;
 	}
-}
+} 
