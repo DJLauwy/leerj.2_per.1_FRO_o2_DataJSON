@@ -15,7 +15,7 @@ body{
 .boek__cover{
 	float:left;
 	padding:0 3rem 0 0;
-	max-width:300px;
+	max-width:150px;
 }
 
 .boek__kop{
