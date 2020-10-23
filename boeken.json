@@ -31,6 +31,21 @@
         "prijs": 11.95
      },
      {
+        "titel": "De Kracht van het NU",
+        "auteurs" : [
+          {
+            "voornaam": "Eckhart",
+            "achternaam": "Tolle"
+          }
+        ],
+        "uitgave": "2001-1",
+        "paginas": 191,
+        "taal": "Nederlands",
+        "ean": 9789020282306,
+        "cover": "https://media.s-bol.com/qlr9k2q1R2jG/550x550.jpg",
+        "prijs": 14.50
+     },
+     {
         "titel": "Antwerpen",
         "cover": "https://media.s-bol.com/7lyMwq1Oo8y/550x825.jpg",
         "voortitel" : "Time to momo -",
