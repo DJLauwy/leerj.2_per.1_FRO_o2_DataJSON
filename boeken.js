@@ -15,7 +15,12 @@ xhr.open('GET', 'boeken.json', true);
 xhr.send();
 
 const boeken = {
+
 	taalFilter: ['Engels', 'Duits', 'Nederlands'],
+	es: 'auteur', //de eigenschap van de boeken waarop gesorteerd wordt
+
+	//er wordt hier een eigenschap data aangemaakt (regel 25 bij het filteren)
+
 	//filteren op taal
 	filteren(gegevens){
 		this.data = gegevens.filter((bk) => {
@@ -26,8 +31,26 @@ const boeken = {
 			return bool;
 		});
 	},
+
+	//de sorteerfunctie
+	sorteren(){
+		if(this.es == 'titel'){
+			this.data.sort((a,b)=>(a.titel.toUpperCase()>b.titel.toUpperCase())?1:-1);
+		} else if(this.es == 'paginas') {
+			this.data.sort((a,b)=>(a.paginas>b.paginas)?1:-1);
+		} else if(this.es == 'uitgave') {
+			this.data.sort((a,b)=>(a.uitgave>b.uitgave)?1:-1);
+		} else if(this.es == 'prijs') {
+			this.data.sort((a,b)=>(a.prijs>b.prijs)?1:-1);  
+		} else if(this.es == 'auteur') {
+			this.data.sort((a,b)=>(a.auteurs[0].achternaam>b.auteurs[0].achternaam)?1:-1);
+		}
+	},
+
 	//er wordt hier een eigenschap data aangemaakt (regel 7)
 	uitvoeren(){
+		//eerst sorteren
+		this.sorteren();
 		let html = "";
 		this.data.forEach(boek =>{
 			//in het geval van een voortitel moet deze voor de titel worden geplaatst
