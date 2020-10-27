@@ -4,6 +4,7 @@ const xhr = new XMLHttpRequest();
 const taalKeuze = document.querySelectorAll('.besturing__cb-taal');
 //select voor keuze sorteren
 const selectSort = document.querySelector('.besturing__select');
+const aantalInWinkelwagen = document.querySelector('.ww__aantal');
 
 xhr.onreadystatechange = () => {
 	if(xhr.readyState == 4 && xhr.status == 200){
@@ -16,6 +17,16 @@ xhr.onreadystatechange = () => {
 xhr.open('GET', 'boeken.json', true);
 xhr.send();
 
+//object ww (winkelwagen)
+//   met properties: bestelling (bestelde boeken)
+//   en methods: filteren, sorteren, uitvoeren ...
+const ww = {
+	bestelling: []
+}
+
+//object boeken
+//   met properties: taalFilter, data, es
+//   en methods: filteren, sorteren, uitvoeren ...
 const boeken = {
 
 	taalFilter: ['Engels', 'Duits', 'Nederlands'],
@@ -75,16 +86,28 @@ const boeken = {
 			//html var toevoegen
 			html += `<section class="boek">`;
 			html += `<img class="boek__cover" src="${boek.cover}" alt="${completeTitel}">`
+			html += `<div class="boek__info">`;
 			html += `<h3 class="boek__kop">${completeTitel}</h3>`;
 			html += `<p class="boek__auteurs">${auteurs}</p>`
 			html += `<span class="boek__uitgave"> ${this.datumOmzetten(boek.uitgave)}</span>`;
 			html += `<span class="boek__ean"> ean: ${boek.ean}</span>`;
 			html += `<span class="boek__paginas"> ${boek.paginas} pagina's </span>`;
 			html += `<span class="boek__taal"> ${boek.taal}</span>`;
-			html += `<div class="boek__prijs">${boek.prijs.toLocaleString('nl-NL', {currency: 'EUR', style: 'currency'})}</div>`;
-			html += `</section>`;
+			html += `<div class="boek__prijs">${boek.prijs.toLocaleString('nl-NL', {currency: 'EUR', style: 'currency'})}
+					<a href="#" class="boek__bestel-knop" data-role="${boek.ean}">bestellen</a></div>`;
+			html += `</div></section>`;
 		});
 		uitvoer.innerHTML = html;
+		//de gemaakte knoppen voorzien van eventlistener
+		document.querySelectorAll('.boek__bestel-knop').forEach(knop => {
+			knop.addEventListener('click', e => {
+				e.preventDefault();
+				let boekID = e.target.getAttribute('data-role');
+				let gekliktBoek = this.data.filter(b => b.ean == boekID);
+				ww.bestelling.push(gekliktBoek[0]);
+				aantalInWinkelwagen.innerHTML = ww.bestelling.length;
+			});
+		});
 	},
 	datumOmzetten(datumString){
 		let datum = new Date(datumString);
