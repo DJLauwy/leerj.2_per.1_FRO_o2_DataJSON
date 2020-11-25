@@ -13,18 +13,114 @@ xhr.onreadystatechange = () => {
 		boeken.uitvoeren();
 	}
 }
-
 xhr.open('GET', 'boeken.json', true);
 xhr.send();
 
 //object ww (winkelwagen)
 //   met properties: bestelling (bestelde boeken)
-//   en methods: filteren, sorteren, uitvoeren ...
+//   en methods: boekToevoegen, dataOphalen, uitvoeren...
+
 const ww = {
-	bestelling: []
+	bestelling: [],
+	boekToevoegen(obj){
+		let gevonden = this.bestelling.filter(b => b.ean == obj.ean);
+		if(gevonden.length == 0){
+			obj.besteldAantal ++;
+			ww.bestelling.push(obj);
+		} else {
+			gevonden[0].besteldAantal ++;
+		}
+		
+		localStorage.wwBestelling = JSON.stringify(this.bestelling);
+		this.uitvoeren();
+	},
+
+	// de data uit de local storage halen
+	dataOphalen(){
+		if(localStorage.wwBestelling){
+			this.bestelling = JSON.parse(localStorage.wwBestelling);
+		}
+		this.uitvoeren();
+	},
+	uitvoeren(){		
+		let html = '<table>';
+		let totaal = 0;
+		let totaalBesteld = 0;
+		this.bestelling.forEach(boek => {
+			//complete titel maken
+			let completeTitel = "";
+			if(boek.voortitel){
+				completeTitel += boek.voortitel + " ";
+			}
+			completeTitel += boek.titel;
+			//opbouwen string
+			html += '<tr>';
+			html += `<td><img src="${boek.cover}" alt="${completeTitel}" class="bestelformulier__cover"></td>`;
+			html += `<td>${completeTitel}</td>`;
+			html += `<td class="bestelformulier__aantal">
+			<i class="fas fa-arrow-down bestelformulier__verlaag" data-role="${boek.ean}"></i>
+			${boek.besteldAantal}
+			<i class="fas fa-arrow-up bestelformulier__verhoog" data-role="${boek.ean}"></i></td>`;
+			html += `<td>${boek.prijs.toLocaleString('nl-NL', {currency: 'EUR', style: 'currency'})}</td>`;
+			html += `<td><i class="fas fa-trash bestelformulier__trash" data-role="${boek.ean}"></i></td>`;
+			html += '</tr>';
+			totaal += boek.prijs*boek.besteldAantal;
+			totaalBesteld += boek.besteldAantal;
+		});
+		html += `<tr><td colspan="3">Totaal</td>
+		<td>${totaal.toLocaleString('nl-NL', {currency: 'EUR', style: 'currency'})}</td>
+		</tr>`;
+		html += '</table>';
+		document.getElementById('uitvoer').innerHTML = html;
+		aantalInWinkelwagen.innerHTML = totaalBesteld;
+		this.trashActiveren();
+		this.hogerLagerActiveren();
+	},
+	hogerLagerActiveren(){
+		//verhoog knop
+		let hogerKnoppen = document.querySelectorAll('.bestelformulier__verhoog');
+		hogerKnoppen.forEach(knop => {
+			knop.addEventListener('click', e => {
+				let ophoogID = e.target.getAttribute('data-role');
+				let opTeHogenBoek = this.bestelling.filter(boek => boek.ean == ophoogID);
+				opTeHogenBoek[0].besteldAantal ++;
+				localStorage.wwBestelling = JSON.stringify(this.bestelling);
+				this.uitvoeren();
+			});
+		});
+
+		//verlaagknop
+		let lagerKnoppen = document.querySelectorAll('.bestelformulier__verlaag');
+		lagerKnoppen.forEach(knop => {
+			knop.addEventListener('click', e => {
+				let verlaagID = e.target.getAttribute('data-role');
+				let teVerlagenAantal = this.bestelling.filter(boek => boek.ean == verlaagID);
+				if(teVerlagenAantal[0].besteldAantal>1){
+					teVerlagenAantal[0].besteldAantal --;
+				} else {
+					//boek verwijderen
+					this.bestelling = this.bestelling.filter(bk => bk.ean != verlaagID);
+				}
+				localStorage.wwBestelling = JSON.stringify(this.bestelling);
+				this.uitvoeren();
+			});
+		});
+	},
+	trashActiveren(){
+		document.querySelectorAll('.bestelformulier__trash').forEach(trash => {
+			trash.addEventListener('click', e => {
+				let teVerwijderenBoekID = e.target.getAttribute('data-role');
+				this.bestelling = this.bestelling.filter(bk => bk.ean != teVerwijderenBoekID);
+				//local storage bijwerken
+				localStorage.wwBestelling = JSON.stringify(this.bestelling);
+				this.uitvoeren();
+			});
+		});
+	}
 }
-ww.bestelling = JSON.parse(localStorage.wwBestelling);
-aantalInWinkelwagen.innerHTML = ww.bestelling.length;
+// de data uit de local storage halen
+ww.dataOphalen();
+
 //object boeken
 //   met properties: taalFilter, data, es
 //   en methods: filteren, sorteren, uitvoeren ...
@@ -68,6 +164,10 @@ const boeken = {
 		this.sorteren();
 		let html = "";
 		this.data.forEach(boek =>{
+
+			//elk boek een eigenschap aantalBesteld geven
+			boek.besteldAantal = 0;
+
 			//in het geval van een voortitel moet deze voor de titel worden geplaatst
 			let completeTitel = "";
 			if(boek.voortitel){
@@ -105,9 +205,7 @@ const boeken = {
 				e.preventDefault();
 				let boekID = e.target.getAttribute('data-role');
 				let gekliktBoek = this.data.filter(b => b.ean == boekID);
-				ww.bestelling.push(gekliktBoek[0]);
-				aantalInWinkelwagen.innerHTML = ww.bestelling.length;
-				localStorage.wwBestelling = JSON.stringify(ww.bestelling);
+				ww.boekToevoegen(gekliktBoek[0]);
 			});
 		});
 	},

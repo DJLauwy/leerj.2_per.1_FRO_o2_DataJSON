@@ -5,12 +5,15 @@
 
 body{
 	font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+	overflow-x: hidden;
+	width:100%;
 }
 
 .ww{
 	position: absolute;
 	right:4em;
 	top:2em;
+	cursor: pointer;
 }
 
 .ww__aantal{
@@ -104,7 +107,7 @@ body{
 
 /* checkbox bestelformulier */
 #haalFormulier{
-	display: none;
+	opacity: 0;
 }
 
 #haalFormulier:checked ~ .bestelformulier{
@@ -124,4 +127,21 @@ body{
 	margin:4vh 4vw;
 	transform: translateX(100vw);
 	transition:transform 1s ease-out;
+}
+
+.bestelformulier__cover{
+	height:3em;
+}
+
+.bestelformulier__trash, 
+.bestelformulier__verlaag, 
+.bestelformulier__verhoog{
+	padding: 0 1em;
+	cursor: pointer;
+}
+
+.bestelformulier__trash:hover, 
+.bestelformulier__verlaag:hover, 
+.bestelformulier__verhoog:hover{
+	color:red;
 }
